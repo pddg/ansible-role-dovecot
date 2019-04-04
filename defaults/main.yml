@@ -1,0 +1,42 @@
+---
+dovecot_repository: https://repo.dovecot.org/ce-2.3-latest/{{ ansible_distribution | lower }}/{{ ansible_distribution_release | lower }}
+dovecot_enabled_protocols:
+  - pop3
+  - imap
+  - lmtp
+
+# Maildir type is used
+dovecot_mail_location: ~/.Maildir/
+
+# Disable imap and pop3 (no SLL) by default
+dovecot_imap_enable: no
+dovecot_pop3_enable: no
+
+dovecot_imaps_port: 993
+dovecot_pop3s_port: 995
+
+dovecot_auth_unix_listener: /var/spool/postfix/private/auth
+dovecot_auth_user: postfix
+
+# Must override these configurations
+dovecot_ssl_options:
+  cert: "/etc/dovecot/private/dovecot.pem"
+  key: "/etc/dovecot/private/dovecot.key"
+
+# Path to Diffie-Hellman parameter
+dovecot_dh_param:
+  path: "/etc/dovecot/dh.pem"
+  length: 4096
+
+# Restrictions for SSL
+dovecot_ssl_min_protocol: TLSv1.1
+dovecot_ssl_ciphers:
+  - "HIGH"
+  - "MEDIUM"
+  - "!aNULL"
+  - "!MD5"
+  - "!SEED"
+  - "!IDEA"
+  - "!RC4"
+  - "!3DES"
+  - "!RSA"

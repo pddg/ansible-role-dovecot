@@ -1,0 +1,73 @@
+---
+- name: Dovecot repository GPG key is added
+  apt_key:
+    id: ED409DA1
+    url: https://repo.dovecot.org/DOVECOT-REPO-GPG
+    keyring: /etc/apt/trusted.gpg.d/dovecot.gpg
+    state: present
+
+- name: Dovecot repository is added
+  apt_repository:
+    repo: "deb {{ dovecot_repository }} {{ ansible_distribution_release | lower }} main"
+    state: present
+    filename: dovecot
+
+- name: Dovecot is installed
+  apt:
+    name:
+      - dovecot-core
+      - dovecot-imapd
+      - dovecot-pop3d
+      - dovecot-lmtpd
+      - openssl
+    cache_valid_time: 3600
+
+- name: Postfix user is created
+  user:
+    name: postfix
+    system: yes
+    create_home: no
+    shell: /sbin/nologin
+
+- name: Auth unix socket directory is present
+  file:
+    path: "{{ dovecot_auth_unix_listener | dirname }}"
+    state: directory
+    mode: 0660
+    owner: "{{ dovecot_auth_user }}"
+    group: "{{ dovecot_auth_user }}"
+
+- name: DH param file is created
+  openssl_dhparam:
+    path: "{{ dovecot_dh_param.path }}"
+    size: "{{ dovecot_dh_param.length }}"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Override configuration file is placed
+  template:
+    src: 'templates/customize.conf.j2'
+    dest: '/etc/dovecot/conf.d/customize.conf'
+    mode: 0600
+    owner: root
+    group: root
+  notify: restart dovecot
+
+- name: Create maildir when user login
+  file:
+    path: '/etc/skel/{{ dovecot_mail_location | dirname }}/{{ item }}'
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+  with_items:
+    - ''
+    - 'new'
+    - 'cur'
+    - 'tmp'
+
+- name: Dovecot started
+  service:
+    name: dovecot
+    state: started
