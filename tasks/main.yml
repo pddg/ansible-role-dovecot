@@ -49,10 +49,18 @@
   template:
     src: 'templates/customize.conf.j2'
     dest: '/etc/dovecot/conf.d/customize.conf'
-    mode: 0600
+    mode: 0644
     owner: root
     group: root
   notify: restart dovecot
+
+- name: PAM auth configuration is placed
+  template:
+    src: 'templates/dovecot.j2'
+    dest: '/etc/pam.d/dovecot'
+    mode: 0644
+    owner: root
+    group: root
 
 - name: Create maildir when user login
   file:

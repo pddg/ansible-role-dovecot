@@ -1,12 +1,12 @@
-ssl = yes
+ssl = required
+disable_plaintext_auth = yes
 ssl_cert = <{{ dovecot_ssl_options.cert }}
 ssl_key = <{{ dovecot_ssl_options.key }}
 
 protocols = {{ dovecot_enabled_protocols | join(" ") }}
 mail_location = maildir:{{ dovecot_mail_location }}
-
+auth_username_format = %n
 ssl_dh = <{{ dovecot_dh_param.path }}
-ssl_dh_parameters_length = {{ dovecot_dh_param.length | default(4096) }}
 ssl_min_protocol = {{ dovecot_ssl_min_protocol }}
 ssl_cipher_list = {{ dovecot_ssl_ciphers | join(":") }}
 
@@ -42,7 +42,7 @@ service lmtp {
 
 service auth {
   unix_listener {{ dovecot_auth_unix_listener }} {
-    mode = 0660
+    mode = 0666
     user = {{ dovecot_auth_user }}
     group = {{ dovecot_auth_user }}
   }
@@ -50,6 +50,6 @@ service auth {
 
 passdb {
   driver = pam
-  args = %s
+  args = session=yes dovecot
 }
 
