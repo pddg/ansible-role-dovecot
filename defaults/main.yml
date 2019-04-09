@@ -16,6 +16,7 @@ dovecot_imaps_port: 993
 dovecot_pop3s_port: 995
 
 dovecot_auth_unix_listener: /var/spool/postfix/private/auth
+dovecot_lmtp_unix_listener: /var/spool/postfix/private/dovecot-lmtp
 dovecot_auth_user: postfix
 
 # Must override these configurations
@@ -26,7 +27,6 @@ dovecot_ssl_options:
 # Path to Diffie-Hellman parameter
 dovecot_dh_param:
   path: "/etc/dovecot/dh.pem"
-  length: 4096
 
 # Restrictions for SSL
 dovecot_ssl_min_protocol: TLSv1.1

@@ -33,16 +33,16 @@ service pop3-login {
 }
 
 service lmtp {
-  unix_listener lmtp {
-    mode = 0666
-    user = postfix
-    group = postfix
+  unix_listener {{ dovecot_lmtp_unix_listener }} {
+    mode = 0600
+    user = {{ dovecot_auth_user }}
+    group = {{ dovecot_auth_user }}
   }
 }
 
 service auth {
   unix_listener {{ dovecot_auth_unix_listener }} {
-    mode = 0666
+    mode = 0600
     user = {{ dovecot_auth_user }}
     group = {{ dovecot_auth_user }}
   }
