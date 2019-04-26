@@ -37,6 +37,11 @@
     owner: "{{ dovecot_auth_user }}"
     group: "{{ dovecot_auth_user }}"
 
+- name: check if DH param file exists
+  stat: 
+    path: "{{ dovecot_dh_param.path }}"
+  register: dovecot_dh_param_exists
+  
 - name: DH param file is created
   openssl_dhparam:
     path: "{{ dovecot_dh_param.path }}"
@@ -44,6 +49,7 @@
     owner: root
     group: root
     mode: 0600
+  when: dovecot_dh_param_exists.stat.exists == false
 
 - name: Override configuration file is placed
   template:
